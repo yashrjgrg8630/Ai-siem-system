@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI-Based SIEM – Real-Time Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #0b0d10;
+    color: #d1d5db;
+}
+
+h1 {
+    text-align: center;
+    padding: 16px;
+    background-color: #111317;
+    border-bottom: 1px solid #27272a;
+    font-size: 22px;
+}
+
+/* ===== SUMMARY CARDS ===== */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 95%;
+    margin: 20px auto;
+}
+
+.card {
+    background: linear-gradient(145deg, #14161b, #0f1116);
+    border-radius: 10px;
+    padding: 18px;
+    border: 1px solid #27272a;
+    text-align: center;
+}
+
+.card h2 {
+    margin: 0;
+    font-size: 26px;
+    color: #f9fafb;
+}
+
+.card span {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* ===== INCIDENT SUMMARY ===== */
+.incident {
+    width: 95%;
+    margin: auto;
+    background-color: #14161b;
+    border: 1px solid #27272a;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+/* ===== CONTROLS ===== */
+.controls {
+    width: 95%;
+    margin: 15px auto;
+    display: flex;
+    gap: 12px;
+}
+
+.controls input,
+.controls select {
+    padding: 9px 12px;
+    border-radius: 6px;
+    border: 1px solid #3f3f46;
+    background-color: #18181b;
+    color: #e5e7eb;
+}
+
+/* ===== LAYOUT ===== */
+.layout {
+    display: grid;
+    grid-template-columns: 3fr 1.3fr;
+    gap: 16px;
+    width: 95%;
+    margin: auto;
+}
+
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #14161b;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 11px;
+    border-bottom: 1px solid #27272a;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    background-color: #18181b;
+    color: #9ca3af;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.ddos { border-left: 4px solid #dc2626; }
+.port_scan { border-left: 4px solid #f59e0b; }
+.brute_force { border-left: 4px solid #a855f7; }
+.normal { border-left: 4px solid #22c55e; }
+
+/* ===== SEVERITY ===== */
+.badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.low { background: rgba(34,197,94,.15); color:#22c55e; }
+.medium { background: rgba(245,158,11,.15); color:#f59e0b; }
+.high { background: rgba(220,38,38,.15); color:#dc2626; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    background-color: #14161b;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #27272a;
+}
+
+.sidebar h3 {
+    margin-top: 0;
+    font-size: 15px;
+    border-bottom: 1px solid #27272a;
+    padding-bottom: 8px;
+}
+
+/* ===== ALERT ===== */
+.alert-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    background: #2b0a0a;
+    color: #dc2626;
+    border-left: 4px solid #dc2626;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0,0,0,.7);
+    animation: fadeOut 4s forwards;
+}
+
+@keyframes fadeOut {
+    0%{opacity:1} 70%{opacity:1} 100%{opacity:0}
+}
+
+footer {
+    text-align: center;
+    padding: 12px;
+    font-size: 12px;
+    color: #6b7280;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔐 AI-Based SIEM – Real-Time Log Dashboard</h1>
+
+<div class="cards">
+    <div class="card"><h2 id="totalLogs">0</h2><span>Total Logs</span></div>
+    <div class="card"><h2 id="totalAttacks">0</h2><span>Total Attacks</span></div>
+    <div class="card"><h2 id="highSeverity">0</h2><span>High Severity</span></div>
+    <div class="card"><h2 id="uniqueIPs">0</h2><span>Unique IPs</span></div>
+</div>
+
+<div class="incident">
+    <strong>Incident Summary</strong>
+    <p id="incidentText">System operating within normal parameters.</p>
+    <strong>System Risk Score: <span id="riskScore">0</span>/100</strong>
+</div>
+
+<div class="controls">
+    <input id="ipSearch" placeholder="Search by Source IP" onkeyup="applyFilters()">
+    <select id="attackFilter" onchange="applyFilters()">
+        <option value="all">All Attacks</option>
+        <option value="ddos">DDoS</option>
+        <option value="port_scan">Port Scan</option>
+        <option value="brute_force">Brute Force</option>
+        <option value="normal">Normal</option>
+    </select>
+</div>
+
+<div class="layout">
+
+<table>
+<thead>
+<tr>
+<th>Time</th><th>Source IP</th><th>Port</th><th>Attack</th><th>Severity</th>
+</tr>
+</thead>
+<tbody id="logTable"></tbody>
+</table>
+
+<div class="sidebar">
+<h3>Top Attacking IPs</h3>
+<ul id="topIPs"></ul>
+
+<h3>Attack Timeline</h3>
+<canvas id="timelineChart"></canvas>
+</div>
+
+</div>
+
+<footer>AI-SIEM System</footer>
+
+<script>
+let allLogs=[], lastSeen=null, chart;
+
+function getSeverity(l){
+    if(l.attack_type==="ddos" && [22,80,443].includes(l.destination_port)) return "high";
+    if(l.attack_type!=="normal") return "medium";
+    return "low";
+}
+
+function loadLogs(){
+fetch("/logs").then(r=>r.json()).then(d=>{
+    allLogs=d;
+    applyFilters();
+});
+}
+
+function applyFilters(){
+    const ip=document.getElementById("ipSearch").value.toLowerCase();
+    const type=document.getElementById("attackFilter").value;
+
+    const filtered=allLogs.filter(l=>{
+        const ipMatch=l.source_ip.toLowerCase().includes(ip);
+        const typeMatch=(type==="all") || (l.attack_type===type);
+        return ipMatch && typeMatch;
+    });
+
+    render(filtered);
+}
+
+function render(logs){
+    document.getElementById("totalLogs").innerText=logs.length;
+    document.getElementById("totalAttacks").innerText=logs.filter(l=>l.attack_type!=="normal").length;
+    document.getElementById("highSeverity").innerText=logs.filter(l=>getSeverity(l)==="high").length;
+    document.getElementById("uniqueIPs").innerText=new Set(logs.map(l=>l.source_ip)).size;
+
+    renderTable(logs);
+    renderTopIPs(logs);
+    renderTimeline(logs);
+    generateIncidentSummary(logs);
+}
+
+function renderTable(logs){
+    const t=document.getElementById("logTable"); t.innerHTML="";
+    logs.forEach(l=>{
+        const s=getSeverity(l);
+        const r=document.createElement("tr");
+        r.className=l.attack_type;
+        r.innerHTML=`
+            <td>${l.timestamp}</td>
+            <td>${l.source_ip}</td>
+            <td>${l.destination_port}</td>
+            <td>${l.attack_type.toUpperCase()}</td>
+            <td><span class="badge ${s}">${s}</span></td>`;
+        t.appendChild(r);
+
+        if(l.attack_type!=="normal" && l.timestamp!==lastSeen){
+            lastSeen=l.timestamp;
+            showAlert(l.attack_type,l.source_ip);
+        }
+    });
+}
+
+function renderTopIPs(logs){
+    const m={}, ul=document.getElementById("topIPs");
+    ul.innerHTML="";
+    logs.forEach(l=>{
+        if(l.attack_type!=="normal")
+            m[l.source_ip]=(m[l.source_ip]||0)+1;
+    });
+    Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,5)
+        .forEach(i=>ul.innerHTML+=`<li>${i[0]} – ${i[1]}</li>`);
+}
+
+function renderTimeline(logs){
+    const map={};
+    logs.forEach(l=>{
+        const t=l.timestamp.substring(11,19);
+        map[t]=(map[t]||0)+1;
+    });
+    if(chart) chart.destroy();
+    chart=new Chart(document.getElementById("timelineChart"),{
+        type:"bar",
+        data:{labels:Object.keys(map),datasets:[{data:Object.values(map),backgroundColor:"#dc2626"}]},
+        options:{plugins:{legend:{display:false}}}
+    });
+}
+
+function generateIncidentSummary(logs){
+    const attacks=logs.filter(l=>l.attack_type!=="normal").length;
+    const high=logs.filter(l=>getSeverity(l)==="high").length;
+    const risk=Math.min(100, attacks*2 + high*3);
+    document.getElementById("riskScore").innerText=risk;
+    document.getElementById("incidentText").innerText =
+        risk>70 ? "High-risk incident detected involving multiple high-severity attacks. Immediate mitigation required."
+        : risk>40 ? "Moderate risk observed. Monitoring recommended."
+        : "System operating within normal parameters.";
+}
+
+function showAlert(t,ip){
+    const a=document.createElement("div");
+    a.className="alert-box";
+    a.innerText=`⚠ ${t.toUpperCase()} attack detected from ${ip}`;
+    document.body.appendChild(a);
+    setTimeout(()=>a.remove(),4000);
+}
+
+setInterval(loadLogs,3000);
+loadLogs();
+</script>
+
+</body>
+</html>
