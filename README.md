@@ -1,153 +1,33 @@
 🔐 AI-Driven SIEM System
+Overview
 
-An AI-enabled Security Information and Event Management (SIEM) system designed to simulate how modern security operations centers monitor logs, detect threats, and respond to cyber incidents in near real time using machine learning techniques.
+An AI-driven Security Information and Event Management (SIEM) system that continuously analyzes system logs to detect cyber attacks, classify threats using machine learning, and assess their severity in near real time, helping security teams identify and respond to incidents efficiently.
 
-📌 Project Description
+Features
 
-This project provides a practical demonstration of a simplified SIEM platform by replicating core security workflows such as:
+Real-time log generation to simulate continuous system activity
 
-Continuous system log generation
-
-Identification of suspicious and malicious activity
-
-Machine-learning-based attack classification
-
-Risk and severity assessment
-# 🔐 AI-Driven SIEM System
-
-An AI-enabled **Security Information and Event Management (SIEM)** system designed to simulate how modern Security Operations Centers (SOCs) monitor logs, detect threats, and respond to cyber incidents in near real time using machine learning techniques.
-
----
-
-## 📌 Project Description
-
-This project provides a practical demonstration of a simplified SIEM platform by replicating core security workflows such as:
-
-- Continuous system log generation  
-- Identification of suspicious and malicious activity  
-- Machine-learning-based attack classification  
-- Risk and severity assessment  
-- Real-time visualization and alerting  
-
----
-
-## 🚀 Core Capabilities
-
-- Real-time log generation at fixed intervals  
-- Detection of common attack patterns, including:
-  - DDoS attacks  
-  - Port scanning  
-  - Brute-force login attempts  
-- Automated severity scoring (**Low, Medium, High**)  
-- Web-based interactive dashboard for monitoring  
-- Advanced filtering and search by IP address and attack category  
-- Analytical insights such as attack timelines and top threat sources  
-- Simulated email alerts for high-severity security events  
-
----
-
-## 🧠 System Architecture
-
-The system follows a **modular architecture**, where the following components work together to simulate a real-world SIEM pipeline:
-
-- Log generation module  
-- Threat detection engine  
-- Machine learning classification models  
-- Visualization and alerting dashboard  
-
-Each component operates independently while sharing data through well-defined interfaces.
-
----
-
-## 🖥️ Application Interface
-
-The web dashboard provides multiple views to monitor and analyze security events:
-
-- Overview dashboard for system status  
-- Live log monitoring panel  
-- Attack filtering by type  
-- Search functionality based on source IP address  
-- Analytics section for trends and attacker insights  
-- High-risk alert simulation via email notifications  
-
----
-
-## 🛠️ Technology Stack
-
-**Backend**
-- Python  
-- Flask  
-
-**Frontend**
-- HTML  
-- CSS  
-- JavaScript  
-
-**Machine Learning**
-- Scikit-learn  
-
-**Visualization**
-- Chart.js  
-
-**Version Control**
-- Git  
-- GitHub  
-
----
-
-## ▶️ Execution Guide
-
-Follow the steps below to run the project locally:
-
-```bash
-git clone https://github.com/yashrjgrg8630/Ai-siem-system.git
-cd Ai-siem-system
-python -m venv venv
-venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python app.py
-
-Real-time visualization and alerting
-🚀 Core Capabilities
-
-Real-time log generation at fixed intervals
-
-Detection of common attack patterns such as:
+Detection of cyber attacks such as:
 
 DDoS attacks
 
 Port scanning
 
-Brute force login attempts
+Brute-force login attempts
+
+Machine-learning-based attack classification
 
 Automated severity scoring (Low, Medium, High)
 
-Web-based interactive dashboard for monitoring
+Interactive web dashboard for live monitoring
 
-Advanced filtering and search by IP address and attack category
+Advanced filtering and search by IP address and attack type
 
-Analytical insights including attack timelines and top threat sources
+Security analytics including attack timelines and top threat sources
 
-Simulated email alerts for high-severity security events
-🧠 System Architecture
+Simulated email alerts for high-severity incidents
 
-The system follows a modular architecture where log generation, threat detection, machine learning models, and visualization components operate together to simulate a real SIEM pipeline.
-🖥️ Application Interface
-
-The dashboard provides multiple views to monitor and analyze security events:
-
-Overview dashboard for system status
-
-Live log monitoring panel
-
-Attack filtering by type
-
-Search functionality based on source IP
-
-Analytics section for trends and attacker insights
-
-High-risk alert simulation via email notifications
-🛠️ Technology Stack
+Tech Stack
 
 Backend: Python, Flask
 
@@ -159,15 +39,38 @@ Visualization: Chart.js
 
 Version Control: Git, GitHub
 
-▶️ Execution Guide
+How It Works
 
-Follow the steps below to run the project locally:
+The system continuously generates and ingests log data simulating real network events.
 
+Logs are analyzed by rule-based detection and machine learning models to identify and classify attacks.
+
+Detected threats are assigned a severity score and displayed on a real-time dashboard, with alerts triggered for critical events.
+
+Results / Output
+
+Successful identification of multiple attack types from simulated logs
+
+Accurate classification of malicious vs normal activity
+
+Clear visualization of attack trends and threat sources
+
+Real-time alerts for high-risk security incidents, simulating SOC behavior
+
+How to Run
+Prerequisites
+
+Python 3.8 or above
+
+Git
+
+Steps
 git clone https://github.com/yashrjgrg8630/Ai-siem-system.git
 cd Ai-siem-system
+python -m venv venv
 venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python app.py
 
 
-Once the application starts, open your browser and access the dashboard to view live logs and security analytics.
+After starting the application, open your browser and access the web dashboard to view live logs, detected attacks, analytics, and alerts.
